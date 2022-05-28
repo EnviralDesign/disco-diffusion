@@ -144,3 +144,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# touhcdesigner specific ignores.
+.py
+Backup/
+bootstrap_test.[0-9]*.toe
