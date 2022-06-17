@@ -152,4 +152,7 @@ bootstrap_test.[0-9]*.toe
 .ddgit/
 .tmp/
 .ffmpeg/
+.curl/
+.magick/
+.conda/
 thirdparty/wget/.wget-hsts
