@@ -149,3 +149,7 @@ cython_debug/
 .py
 Backup/
 bootstrap_test.[0-9]*.toe
+.ddgit/
+.tmp/
+.ffmpeg/
+thirdparty/wget/.wget-hsts
