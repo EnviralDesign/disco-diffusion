@@ -62,10 +62,11 @@ SET conda_zip=%~dp0.conda\%conda_zip_file_name%
 
 
 
-:: Define some executables
+:: Define some executables that are already included with repo
 SET wget=%~dp0thirdparty\wget\wget.exe
 SET unzip=%~dp0thirdparty\7zip\7za.exe
 
+:: Define some executables that will be downloaded/checked for in this script.
 SET ffmpeg=%ffmpeg_dir%\ffmpeg-5.0.1-essentials_build\bin\ffmpeg.exe
 SET git=%git_dir%\bin\git.exe
 SET magick=%magick_dir%\magick.exe
@@ -90,6 +91,7 @@ SET conda_download_cmd="%wget%" -nv --show-progress -P "%conda_dir%" "%conda_url
 :: we need to follow the command line instructions to install conda portably:
 :: https://docs.conda.io/projects/conda/en/latest/user-guide/install/windows.html#installing-in-silent-mode
 
+:: ======================= FFMPEG =============================
 :: only download ffmpeg if it doesn't already exist.
 if not exist "%ffmpeg_zip%" (
     start "" /WAIT /B %ffmpeg_download_cmd%
@@ -100,6 +102,7 @@ if not exist "%ffmpeg%" (
     start "" /WAIT /B %ffmpeg_unzip_cmd%
 )
 
+:: ======================= GIT =============================
 :: only download git if it doesn't already exist.
 if not exist "%git_zip%" (
     start "" /WAIT /B %git_download_cmd%
@@ -111,6 +114,7 @@ if not exist "%git%" (
     %git_dir%\git-bash.exe --no-needs-console --hide --no-cd --command=post-install.bat
 )
 
+:: ======================= IMAGE MAGICK =============================
 :: only download image magick if it doesn't already exist.
 if not exist "%magick_zip%" (
     start "" /WAIT /B %magick_download_cmd%
@@ -121,6 +125,7 @@ if not exist "%magick%" (
     start "" /WAIT /B %magick_unzip_cmd%
 )
 
+:: ======================= CURL =============================
 :: only download curl if it doesn't already exist.
 if not exist "%curl_zip%" (
     start "" /WAIT /B %curl_download_cmd%
@@ -131,7 +136,7 @@ if not exist "%curl%" (
     start "" /WAIT /B %curl_unzip_cmd%
 )
 
-
+:: ======================= CONDA =============================
 :: only download conda if it doesn't already exist.
 if not exist "%conda_zip%" (
     start "" /WAIT /B %conda_download_cmd%
@@ -142,8 +147,18 @@ if not exist "%conda%" (
     %conda_zip% /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=%conda_dir%
 )
 
+@REM start "" /WAIT /B "conda create --name disco-diffusion python=3.9"
+@REM start "" /WAIT /D %conda_dir% "_conda.exe create -y --name disco-diffusion python=3.9"
+%conda% create -y --name disco-diffusion python=3.9
+
+:: ok the problem here is that we are not finding opencv-python in the default conda repos.
+:: need to find out what version is installed at home (can test here by manually making conda env, activate, install)
+:: and then try to find out which channel we need to include.
+%conda% install -n disco-diffusion -y -c conda-forge ipykernel opencv-python pandas regex matplotlib ipywidgets
+
+
 :: NO GO PAST!!!
-exit /b 1
+@REM exit /b 1
 
 
 
