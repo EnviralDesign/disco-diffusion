@@ -157,3 +157,9 @@ bootstrap_test.[0-9]*.toe
 .conda/
 .td/
 thirdparty/wget/.wget-hsts
+AdaBins/
+CLIP/
+disco-diffusion/
+guided-diffusion/
+pytorch3d-lite/
+ResizeRight/

@@ -31,7 +31,7 @@ SET git_zip_file_name=PortableGit-2.36.1-64-bit.7z.exe
 SET git_url="https://github.com/git-for-windows/git/releases/download/v2.36.1.windows.1/%git_zip_file_name%"
 
 SET magick_zip_file_name=ImageMagick-7.1.0-portable-Q16-x64.zip
-SET magick_url="https://download.imagemagick.org/ImageMagick/download/binaries/%magick_zip_file_name%"
+SET magick_url="https://imagemagick.org/archive/binaries/%magick_zip_file_name%"
 
 SET curl_zip_file_name=curl-7.83.1_4-win64-mingw.zip
 SET curl_url="https://curl.se/windows/dl-7.83.1_4/%curl_zip_file_name%"
@@ -147,27 +147,6 @@ if not exist "%curl%" (
 
 :: ======================= TOUCHDESIGNER =============================
 
-:: IF registry entry exists, get path to TD executable and set to variable td_executable_path
-:: Next, trim off the last 5 characters to get the pure path. !! characters are used for DelayedExpansion
-
-:: This is the full path to the TouchDesigner executable. We init blank, then set later if found in windows registry.
-@REM SET td_executable_path=
-
-:: currently this does not work, why is unclear since it's direct copy paste from GP's startup script.
-:: perhaps we just give in and install TD locally no matter what?
-@REM reg query %td_registry_query%>nul
-@REM if %errorlevel% equ 0 (
-@REM     FOR /F "usebackq tokens=2,* skip=2" %%L IN (
-@REM         `reg query "%td_registry_query%"`
-@REM     ) DO SET td_executable_path=%%M
-@REM     SET td_executable_path=!td_executable_path:~0,-5!
-@REM     if exist !td_executable_path! goto TD_Is_Already_Installed
-@REM ) else (
-@REM     goto TD_Needs_To_Be_Installed
-@REM )
-
-@REM :TD_Needs_To_Be_Installed
-
 :: only download if it doesn't already exist.
 if not exist "%td_zip%" (
     start "" /WAIT /B %td_download_cmd%
@@ -192,22 +171,21 @@ if not exist "%conda%" (
     :: install miniconda silently, and as portably as possible.
     %conda_zip% /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=%conda_dir%
 
-    :: create the disco-diffusion miniconda python environment.
-    call .conda\Scripts\activate.bat %conda_dir% & conda create -y --name disco-diffusion python=3.9
-
-    :: install dependancies and pytorch.
-    call .conda\Scripts\activate.bat disco-diffusion & pip install ipykernel opencv-python pandas regex matplotlib ipywidgets & conda install -y pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
-    
-    :: use this line instead for example if you are trying to use vitl models on a graphics card that gives you the cuda address misaligned error.
-    :: call .conda\Scripts\activate.bat %conda_dir% & conda activate disco-diffusion & pip install ipykernel opencv-python pandas regex matplotlib ipywidgets & conda install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch
-
+    :: setup conda venv, and install some dependancies.
+    call .conda\condabin\conda.bat create -y --name disco-diffusion python=3.9
+    call .conda\condabin\conda.bat activate disco-diffusion & pip install ipykernel opencv-python pandas regex matplotlib ipywidgets
+    call .conda\condabin\conda.bat install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch
 )
 
-:: NO GO PAST!!!
+:: the issue now is that we always get the error AssertionError: Torch not compiled with CUDA enabled when running disco.
+:: unclear why, but we've tried the latest pytorch, as well as the custom version that works for our rtx 5000.
+:: also tried with and without installing windows cuda stuffs.
+
+
 @REM exit /b 1
 
-
-
-
-
 Pause
+
+
+:: use this line instead for example if you are trying to use vitl models on a graphics card that gives you the cuda address misaligned error.
+:: conda install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch
