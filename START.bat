@@ -36,9 +36,14 @@ SET magick_url="https://download.imagemagick.org/ImageMagick/download/binaries/%
 SET curl_zip_file_name=curl-7.83.1_4-win64-mingw.zip
 SET curl_url="https://curl.se/windows/dl-7.83.1_4/%curl_zip_file_name%"
 
+SET td_year=2021
+SET td_version=16410
+SET td_zip_file_name=TouchDesigner.%td_year%.%td_version%.exe
+SET td_url="https://download.derivative.ca/%td_zip_file_name%.exe"
+SET td_registry_query="HKEY_CLASSES_ROOT\TouchDesigner.%td_year%.%td_version%\shell\open\command"
+
 SET conda_zip_file_name=Miniconda3-py39_4.12.0-Windows-x86_64.exe
 SET conda_url="https://repo.anaconda.com/miniconda/%conda_zip_file_name%"
-
 
 
 :: Define some paths
@@ -56,10 +61,11 @@ SET magick_zip=%~dp0.magick\%magick_zip_file_name%
 SET curl_dir=%~dp0.curl
 SET curl_zip=%~dp0.curl\%curl_zip_file_name%
 
+SET td_dir=%~dp0.td
+SET td_zip=%~dp0.td\%td_zip_file_name%
+
 SET conda_dir=%~dp0.conda
 SET conda_zip=%~dp0.conda\%conda_zip_file_name%
-
-
 
 
 :: Define some executables that are already included with repo
@@ -71,8 +77,8 @@ SET ffmpeg=%ffmpeg_dir%\ffmpeg-5.0.1-essentials_build\bin\ffmpeg.exe
 SET git=%git_dir%\bin\git.exe
 SET magick=%magick_dir%\magick.exe
 SET curl=%curl_dir%\curl-7.83.1_4-win64-mingw\bin\curl.exe
+SET td=%td_dir%\bin\TouchDesigner.exe
 SET conda=%conda_dir%\_conda.exe
-
 
 :: Define some commands
 SET ffmpeg_download_cmd="%wget%" -nv --show-progress -P "%ffmpeg_dir%" "%ffmpeg_url%"
@@ -87,9 +93,12 @@ SET magick_unzip_cmd="%unzip%" x "%magick_zip%" -aoa -o"%magick_dir%"
 SET curl_download_cmd="%wget%" -nv --show-progress -P "%curl_dir%" "%curl_url%"
 SET curl_unzip_cmd="%unzip%" x "%curl_zip%" -aoa -o"%curl_dir%"
 
+SET td_download_cmd="%wget%" -nv --show-progress -P "%td_dir%" "%td_url%"
+
 SET conda_download_cmd="%wget%" -nv --show-progress -P "%conda_dir%" "%conda_url%"
 :: we need to follow the command line instructions to install conda portably:
 :: https://docs.conda.io/projects/conda/en/latest/user-guide/install/windows.html#installing-in-silent-mode
+
 
 :: ======================= FFMPEG =============================
 :: only download ffmpeg if it doesn't already exist.
@@ -136,26 +145,63 @@ if not exist "%curl%" (
     start "" /WAIT /B %curl_unzip_cmd%
 )
 
+:: ======================= TOUCHDESIGNER =============================
+
+:: IF registry entry exists, get path to TD executable and set to variable td_executable_path
+:: Next, trim off the last 5 characters to get the pure path. !! characters are used for DelayedExpansion
+
+:: This is the full path to the TouchDesigner executable. We init blank, then set later if found in windows registry.
+@REM SET td_executable_path=
+
+:: currently this does not work, why is unclear since it's direct copy paste from GP's startup script.
+:: perhaps we just give in and install TD locally no matter what?
+@REM reg query %td_registry_query%>nul
+@REM if %errorlevel% equ 0 (
+@REM     FOR /F "usebackq tokens=2,* skip=2" %%L IN (
+@REM         `reg query "%td_registry_query%"`
+@REM     ) DO SET td_executable_path=%%M
+@REM     SET td_executable_path=!td_executable_path:~0,-5!
+@REM     if exist !td_executable_path! goto TD_Is_Already_Installed
+@REM ) else (
+@REM     goto TD_Needs_To_Be_Installed
+@REM )
+
+@REM :TD_Needs_To_Be_Installed
+
+:: only download if it doesn't already exist.
+if not exist "%td_zip%" (
+    start "" /WAIT /B %td_download_cmd%
+)
+
+:: only install if it doesn't already exist. we check for main executable.
+if not exist "%td%" (
+    %td_zip% /VERYSILENT /DIR=%td_dir% /SUPPRESSMSGBOXES
+)
+
+@REM :TD_Is_Already_Installed
+
 :: ======================= CONDA =============================
 :: only download conda if it doesn't already exist.
 if not exist "%conda_zip%" (
     start "" /WAIT /B %conda_download_cmd%
 )
 
-:: only unzip conda if it doesn't already exist. we check for main executable.
+:: If conda executable doesn't exist, we assume nothing conda related has been setup, and we go through the whole process.
 if not exist "%conda%" (
+
+    :: install miniconda silently, and as portably as possible.
     %conda_zip% /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /NoRegistry=1 /S /D=%conda_dir%
+
+    :: create the disco-diffusion miniconda python environment.
+    call .conda\Scripts\activate.bat %conda_dir% & conda create -y --name disco-diffusion python=3.9
+
+    :: install dependancies and pytorch.
+    call .conda\Scripts\activate.bat disco-diffusion & pip install ipykernel opencv-python pandas regex matplotlib ipywidgets & conda install -y pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+    
+    :: use this line instead for example if you are trying to use vitl models on a graphics card that gives you the cuda address misaligned error.
+    :: call .conda\Scripts\activate.bat %conda_dir% & conda activate disco-diffusion & pip install ipykernel opencv-python pandas regex matplotlib ipywidgets & conda install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch
+
 )
-
-@REM start "" /WAIT /B "conda create --name disco-diffusion python=3.9"
-@REM start "" /WAIT /D %conda_dir% "_conda.exe create -y --name disco-diffusion python=3.9"
-%conda% create -y --name disco-diffusion python=3.9
-
-:: ok the problem here is that we are not finding opencv-python in the default conda repos.
-:: need to find out what version is installed at home (can test here by manually making conda env, activate, install)
-:: and then try to find out which channel we need to include.
-%conda% install -n disco-diffusion -y -c conda-forge ipykernel opencv-python pandas regex matplotlib ipywidgets
-
 
 :: NO GO PAST!!!
 @REM exit /b 1

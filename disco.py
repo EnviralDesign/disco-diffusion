@@ -1,3 +1,32 @@
+import os
+import sys
+sys.path.append( os.getcwd() )
+sys.path.append( f'{os.getcwd()}\\.conda\\envs\\disco-diffusion\\Lib\\site-packages' )
+# for each in sys.path:
+#     print(each)
+
+print('----------------')
+os_path = os.environ['PATH']
+
+ffmpeg = f'{os.getcwd()}\\.ffmpeg\\ffmpeg-5.0.1-essentials_build\\bin;'
+git = f'{os.getcwd()}\\.ddgit\\bin;'
+magick = f'{os.getcwd()}\\.magick;'
+curl = f'{os.getcwd()}\\.curl\\curl-7.83.1_4-win64-mingw\\bin;'
+wget = f'{os.getcwd()}\\thirdparty\\wget;'
+
+os_path += ffmpeg
+os_path += git
+os_path += magick
+os_path += curl
+os_path += wget
+
+os.environ['PATH'] = os_path
+
+print( 'OS_PATH', os.environ['PATH'] )
+print('----------------')
+# a
+
+
 # %%
 # !! {"metadata":{
 # !!   "id": "view-in-github",

@@ -155,4 +155,5 @@ bootstrap_test.[0-9]*.toe
 .curl/
 .magick/
 .conda/
+.td/
 thirdparty/wget/.wget-hsts
