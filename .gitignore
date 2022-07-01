@@ -149,17 +149,17 @@ cython_debug/
 .py
 Backup/
 bootstrap_test.[0-9]*.toe
-.ddgit/
-.tmp/
-.ffmpeg/
-.curl/
-.magick/
-.conda/
-.td/
-thirdparty/wget/.wget-hsts
-AdaBins/
-CLIP/
-disco-diffusion/
-guided-diffusion/
-pytorch3d-lite/
-ResizeRight/
+# .ddgit/
+# .tmp/
+# .ffmpeg/
+# .curl/
+# .magick/
+# .conda/
+# .td/
+# thirdparty/wget/.wget-hsts
+# AdaBins/
+# CLIP/
+# disco-diffusion/
+# guided-diffusion/
+# pytorch3d-lite/
+# ResizeRight/
