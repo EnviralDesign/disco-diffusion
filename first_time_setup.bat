@@ -147,6 +147,9 @@ if not exist "%curl%" (
 
 :: ======================= TOUCHDESIGNER =============================
 
+:: Skip TouchDesigner install for now, assume it's been installed already.
+@REM goto TD_Is_Already_Installed
+
 :: only download if it doesn't already exist.
 if not exist "%td_zip%" (
     start "" /WAIT /B %td_download_cmd%
@@ -175,18 +178,16 @@ if not exist "%conda%" (
     call .conda\condabin\conda.bat create -y --name disco-diffusion python=3.9
     call .conda\condabin\conda.bat activate disco-diffusion & pip install ipykernel opencv-python pandas regex matplotlib ipywidgets
     :: call .conda\condabin\conda.bat install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch
-    call .conda\condabin\conda.bat install -y pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=10.2 -c pytorch
+    :: call .conda\condabin\conda.bat install -y pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=10.2 -c pytorch
+    call .conda\condabin\conda.bat install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+    
 )
 
-:: the issue now is that we always get the error AssertionError: Torch not compiled with CUDA enabled when running disco.
-:: unclear why, but we've tried the latest pytorch, as well as the custom version that works for our rtx 5000.
-:: also tried with and without installing windows cuda stuffs.
+call .conda\condabin\conda.bat activate disco-diffusion & python -m first_time_disco
 
-
-@REM exit /b 1
+@echo "============================================"
+@echo "======= END Disco Diffusion BootStrap ======"
+@echo "============================================"
 
 Pause
 
-
-:: use this line instead for example if you are trying to use vitl models on a graphics card that gives you the cuda address misaligned error.
-:: conda install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch

@@ -1730,12 +1730,12 @@ diffusion_sampling_mode = 'ddim' #@param ['plms','ddim']
 use_checkpoint = True #@param {type: 'boolean'}
 ViTB32 = True #@param{type:"boolean"}
 ViTB16 = True #@param{type:"boolean"}
-ViTL14 = False #@param{type:"boolean"}
-RN101 = False #@param{type:"boolean"}
+ViTL14 = True #@param{type:"boolean"}
+RN101 = True #@param{type:"boolean"}
 RN50 = True #@param{type:"boolean"}
-RN50x4 = False #@param{type:"boolean"}
-RN50x16 = False #@param{type:"boolean"}
-RN50x64 = False #@param{type:"boolean"}
+RN50x4 = True #@param{type:"boolean"}
+RN50x16 = True #@param{type:"boolean"}
+RN50x64 = True #@param{type:"boolean"}
 
 #@markdown If you're having issues with model downloads, check this to compare SHA's:
 check_model_SHA = False #@param{type:"boolean"}
@@ -1921,9 +1921,9 @@ lpips_model = lpips.LPIPS(net='vgg').to(device)
 # !!   "id": "BasicSettings"
 # !! }}
 #@markdown ####**Basic Settings:**
-batch_name = 'TimeToDisco' #@param{type: 'string'}
-steps = 250 #@param [25,50,100,150,250,500,1000]{type: 'raw', allow-input: true}
-width_height = [1280, 768]#@param{type: 'raw'}
+batch_name = 'first_time_disco' #@param{type: 'string'}
+steps = 15 #@param [25,50,100,150,250,500,1000]{type: 'raw', allow-input: true}
+width_height = [512, 512]#@param{type: 'raw'}
 clip_guidance_scale = 5000 #@param{type: 'number'}
 tv_scale =  0#@param{type: 'number'}
 range_scale =   150#@param{type: 'number'}
