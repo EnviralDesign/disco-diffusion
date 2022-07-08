@@ -1928,7 +1928,7 @@ clip_guidance_scale = 5000 #@param{type: 'number'}
 tv_scale =  0#@param{type: 'number'}
 range_scale =   150#@param{type: 'number'}
 sat_scale =   0#@param{type: 'number'}
-cutn_batches = 4  #@param{type: 'number'}
+cutn_batches = 1  #@param{type: 'number'}
 skip_augs = False#@param{type: 'boolean'}
 
 #@markdown ---
@@ -2430,8 +2430,8 @@ image_prompts = {
 # !! }}
 #@title Do the Run!
 #@markdown `n_batches` ignored with animation modes.
-display_rate =  50 #@param{type: 'number'}
-n_batches =  50 #@param{type: 'number'}
+display_rate =  1 #@param{type: 'number'}
+n_batches =  1 #@param{type: 'number'}
 
 #Update Model Settings
 timestep_respacing = f'ddim{steps}'
