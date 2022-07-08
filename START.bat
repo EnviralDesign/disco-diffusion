@@ -39,7 +39,7 @@ SET curl_url="https://curl.se/windows/dl-7.83.1_4/%curl_zip_file_name%"
 SET td_year=2021
 SET td_version=16410
 SET td_zip_file_name=TouchDesigner.%td_year%.%td_version%.exe
-SET td_url="https://download.derivative.ca/%td_zip_file_name%.exe"
+SET td_url="https://download.derivative.ca/%td_zip_file_name%"
 SET td_registry_query="HKEY_CLASSES_ROOT\TouchDesigner.%td_year%.%td_version%\shell\open\command"
 
 SET conda_zip_file_name=Miniconda3-py39_4.12.0-Windows-x86_64.exe
@@ -174,7 +174,8 @@ if not exist "%conda%" (
     :: setup conda venv, and install some dependancies.
     call .conda\condabin\conda.bat create -y --name disco-diffusion python=3.9
     call .conda\condabin\conda.bat activate disco-diffusion & pip install ipykernel opencv-python pandas regex matplotlib ipywidgets
-    call .conda\condabin\conda.bat install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch
+    :: call .conda\condabin\conda.bat install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch
+    call .conda\condabin\conda.bat install -y pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=10.2 -c pytorch
 )
 
 :: the issue now is that we always get the error AssertionError: Torch not compiled with CUDA enabled when running disco.

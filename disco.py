@@ -1,3 +1,10 @@
+# import torch
+# useCPU = False
+# DEVICE = torch.device('cuda:0' if (torch.cuda.is_available() and not useCPU) else 'cpu')
+# print('Using device:', DEVICE)
+
+# a
+
 import os
 import sys
 sys.path.append( os.getcwd() )
